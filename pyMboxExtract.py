@@ -1,6 +1,7 @@
 import sys
 import mailbox
 import os
+from email.header import decode_header
 
 def extractattachements(message):
     if message.get_content_maintype() == 'multipart':
@@ -8,6 +9,8 @@ def extractattachements(message):
             if part.get_content_maintype() == 'multipart': continue
             if part.get('Content-Disposition') is None: continue
             filename = part.get_filename()
+            if decode_header(filename)[0][1] is not None:
+                filename = decode_header(filename)[0][0].decode(decode_header(filename)[0][1])
             print(filename)
             fb = open(filename,'wb')
             fb.write(part.get_payload(decode=True))
